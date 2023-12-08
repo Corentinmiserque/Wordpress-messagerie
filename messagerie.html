@@ -152,34 +152,46 @@
 
 
     
-    sendMsg.addEventListener('click', e => {
-        e.preventDefault()
-        let data = new FormData(formSendMsg)
-        let dataJson = {
-            "title": data.get('title'),
-            "content": data.get('content'),
-            "status": "publish"
-        }
-        console.log(dataJson)
-        $titre.value = ""
-        $contenu.value = ""
-        if(dataJson.content != ""){
-            fetch('https://cepegra-frontend.xyz/wp-json/wp/v2/message', {
-                method : 'POST',
-                headers : {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${userToken}`
-                    },
-                body : JSON.stringify(dataJson)
-                // "title":"test 4","content":"<p>test contenu 4</p>","status":"publish"
-                })
+// ...
+
+sendMsg.addEventListener('click', e => {
+    e.preventDefault();
+
+    const userToken = sessionStorage.getItem('token');
+    if (!userToken) {
+        console.error('Token utilisateur non trouvé dans le stockage local');
+        return;
+    }
+
+    let data = new FormData(formSendMsg);
+    let dataJson = {
+        "title": data.get('title'),
+        "content": data.get('content'),
+        "status": "publish"
+    };
+    console.log(dataJson);
+    $titre.value = "";
+    $contenu.value = "";
+
+    if (dataJson.content != "") {
+        fetch('https://cepegra-frontend.xyz/wp-json/wp/v2/message', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            },
+            body: JSON.stringify(dataJson)
+        })
             .then(resp => resp.json())
             .then(resp => console.log(resp))
             .catch(err => console.error(err));
-        }
-        else {
-            alert('Vous ne pouvez pas envoyer un message vide')
-        }})
+    } else {
+        alert('Vous ne pouvez pas envoyer un message vide');
+    }
+});
+
+// ...
+
 
 
 
