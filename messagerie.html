@@ -25,30 +25,36 @@
         .listeMsg {
             height: 85%;
             background-color: grey;
+            overflow-y: scroll;
         }
         .entreeMsg {
             height: 15%;
-            background-color: cyan;
+            background-color: black;
             display: flex;
             flex: 1;
+            align-items: center;
         }
         .titreMsg {
             width: 20%;
             height: 100%;
-            background-color: aqua;
+            background-color: black;
+            border: 1px solid white;
+            color: white;
             padding: .8rem;
-            border: none;
         }
         .contenuMsg {
             width: 75%;
             height: 100%;
-            background-color: aqua;
+            background-color: black;
             padding: .8rem;
-            border: none;
+            color: white;
+            border: white 1px solid;
         }
         .envoyerMsg {
             height: 100%;
             width: 5%;
+            background-color: black;
+            color: white;
         }
         .unMsg {
             margin: 1rem;
@@ -57,7 +63,7 @@
             border: 1px solid black;
         }
         .unMsg h3 {
-            font-size: 1.6rem;
+            font-size: 1.3rem;
         }
         .unMsg p {
             font-size: 1rem;
@@ -84,7 +90,6 @@
             <label for="titre"></label>
             <input class="contenuMsg" type="text" name="content" id="contenu" placeholder="Votre Message..">
             <label for="contenu"></label>
-            <input class="hidden" type="text" name="status" value="published">
             <button class="envoyerMsg" type="submit">></button>
         </form>
     </main>
@@ -96,6 +101,9 @@
         const sendMsg = document.querySelector('.envoyerMsg')
         const formSendMsg = document.querySelector('.entreeMsg')
 
+        let $titre = document.getElementById('titre');
+        let $contenu = document.getElementById('contenu');
+        
         async function getMsgs() {
             try {
             const resp = await fetch(`https://cepegra-frontend.xyz/wp-json/wp/v2/message`)
@@ -129,20 +137,25 @@
             "status": "publish"
         }
         console.log(dataJson)
-
-        fetch('https://cepegra-frontend.xyz/wp-json/wp/v2/message', {
-            method : 'POST',
-            headers : {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2NlcGVncmEtZnJvbnRlbmQueHl6IiwiaWF0IjoxNzAyMDQxMTM2LCJuYmYiOjE3MDIwNDExMzYsImV4cCI6MTcwMjY0NTkzNiwiZGF0YSI6eyJ1c2VyIjp7ImlkIjoiMyJ9fX0.pnzCMln2IBnv-_9GIjsBvTupc98CKYXO6YNXgO5k81M'
-                },
-            body : JSON.stringify(dataJson)
-            // "title":"test 4","content":"<p>test contenu 4</p>","status":"publish"
-            })
-        .then(resp => resp.json())
-        .then(resp => console.log(resp))
-        .catch(err => console.error(err));
-    })
+        $titre.value = ""
+        $contenu.value = ""
+        if(dataJson.content != ""){
+            fetch('https://cepegra-frontend.xyz/wp-json/wp/v2/message', {
+                method : 'POST',
+                headers : {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2NlcGVncmEtZnJvbnRlbmQueHl6IiwiaWF0IjoxNzAyMDQxMTM2LCJuYmYiOjE3MDIwNDExMzYsImV4cCI6MTcwMjY0NTkzNiwiZGF0YSI6eyJ1c2VyIjp7ImlkIjoiMyJ9fX0.pnzCMln2IBnv-_9GIjsBvTupc98CKYXO6YNXgO5k81M'
+                    },
+                body : JSON.stringify(dataJson)
+                // "title":"test 4","content":"<p>test contenu 4</p>","status":"publish"
+                })
+            .then(resp => resp.json())
+            .then(resp => console.log(resp))
+            .catch(err => console.error(err));
+        }
+        else {
+            alert('Vous ne pouvez pas envoyer un message vide')
+        }})
 
 setInterval(getMsgs, 2000)
         
