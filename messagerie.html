@@ -112,6 +112,7 @@
                         </div>
                     `
                 });
+                defilMsg.innerHTML = ""
                 defilMsg.innerHTML += template
             }
             else {alert('coucou')}
@@ -122,25 +123,28 @@
     sendMsg.addEventListener('click', e => {
         e.preventDefault()
         let data = new FormData(formSendMsg)
-        console.log(data)
-/*
+        let dataJson = {
+            "title": data.get('title'),
+            "content": data.get('content'),
+            "status": "publish"
+        }
+        console.log(dataJson)
+
         fetch('https://cepegra-frontend.xyz/wp-json/wp/v2/message', {
             method : 'POST',
             headers : {
-                'Content-Type': 'multipart/form-data',
+                'Content-Type': 'application/json',
                 Authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2NlcGVncmEtZnJvbnRlbmQueHl6IiwiaWF0IjoxNzAyMDQxMTM2LCJuYmYiOjE3MDIwNDExMzYsImV4cCI6MTcwMjY0NTkzNiwiZGF0YSI6eyJ1c2VyIjp7ImlkIjoiMyJ9fX0.pnzCMln2IBnv-_9GIjsBvTupc98CKYXO6YNXgO5k81M'
                 },
-            body : data
+            body : JSON.stringify(dataJson)
             // "title":"test 4","content":"<p>test contenu 4</p>","status":"publish"
             })
         .then(resp => resp.json())
         .then(resp => console.log(resp))
         .catch(err => console.error(err));
-        */
     })
 
-    getMsgs()
-//setInterval(getMsgs, 1000, alert('couocu'))
+setInterval(getMsgs, 2000)
         
 
     </script>
