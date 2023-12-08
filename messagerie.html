@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messagerie</title>
+
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: Verdana;
+            font-size: 1rem;
+        }
+        .pageMsg {
+            display: flex;
+            flex-direction: column;
+            width: 40%;
+            height: 100vh;
+            margin: auto;
+            background-color: aqua;
+        }
+        .listeMsg {
+            height: 85%;
+            background-color: grey;
+        }
+        .entreeMsg {
+            height: 15%;
+            background-color: cyan;
+            display: flex;
+            flex: 1;
+        }
+        .titreMsg {
+            width: 20%;
+            height: 100%;
+            background-color: aqua;
+            padding: .8rem;
+            border: none;
+        }
+        .contenuMsg {
+            width: 75%;
+            height: 100%;
+            background-color: aqua;
+            padding: .8rem;
+            border: none;
+        }
+        .envoyerMsg {
+            height: 100%;
+            width: 5%;
+        }
+        .unMsg {
+            margin: 1rem;
+            padding: 1rem;
+            background-color: yellow;
+            border: 1px solid black;
+        }
+        .unMsg h3 {
+            font-size: 1.6rem;
+        }
+        .unMsg p {
+            font-size: 1rem;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+
+</head>
+
+<body>
+    
+    <main class="pageMsg">
+        <section class="listeMsg">
+
+            <div class="unMsg">
+                <h3>Test</h3><br><p>test du css</p>
+            </div>
+
+        </section>
+        <form action="" class="entreeMsg">
+            <input class="titreMsg" type="text" name="title" id="titre" placeholder="Votre Titre..">
+            <label for="titre"></label>
+            <input class="contenuMsg" type="text" name="content" id="contenu" placeholder="Votre Message..">
+            <label for="contenu"></label>
+            <input class="hidden" type="text" name="status" value="published">
+            <button class="envoyerMsg" type="submit">></button>
+        </form>
+    </main>
+
+
+    <script>
+
+        const defilMsg = document.querySelector('.listeMsg')
+        const sendMsg = document.querySelector('.envoyerMsg')
+        const formSendMsg = document.querySelector('.entreeMsg')
+
+        async function getMsgs() {
+            try {
+            const resp = await fetch(`https://cepegra-frontend.xyz/wp-json/wp/v2/message`)
+            const data = await resp.json()
+            let status = resp.status
+            console.log(data)
+            if(resp.status = 200) {
+                let template = ``
+                data.forEach(msg => {
+                    template += `
+                        <div class="unMsg">
+                        <h3>${msg.title.rendered}</h3><br>${msg.content.rendered}
+
+                        </div>
+                    `
+                });
+                defilMsg.innerHTML += template
+            }
+            else {alert('coucou')}
+            }
+            catch(error) {console.log('erreur', error.message)}
+        }
+    
+    sendMsg.addEventListener('click', e => {
+        e.preventDefault()
+        let data = new FormData(formSendMsg)
+        console.log(data)
+/*
+        fetch('https://cepegra-frontend.xyz/wp-json/wp/v2/message', {
+            method : 'POST',
+            headers : {
+                'Content-Type': 'multipart/form-data',
+                Authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2NlcGVncmEtZnJvbnRlbmQueHl6IiwiaWF0IjoxNzAyMDQxMTM2LCJuYmYiOjE3MDIwNDExMzYsImV4cCI6MTcwMjY0NTkzNiwiZGF0YSI6eyJ1c2VyIjp7ImlkIjoiMyJ9fX0.pnzCMln2IBnv-_9GIjsBvTupc98CKYXO6YNXgO5k81M'
+                },
+            body : data
+            // "title":"test 4","content":"<p>test contenu 4</p>","status":"publish"
+            })
+        .then(resp => resp.json())
+        .then(resp => console.log(resp))
+        .catch(err => console.error(err));
+        */
+    })
+
+    getMsgs()
+//setInterval(getMsgs, 1000, alert('couocu'))
+        
+
+    </script>
+
+</body>
+</html>
