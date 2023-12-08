@@ -27,6 +27,8 @@
             overflow-y: auto;
             background-color: grey;
             overflow-y: scroll;
+            scroll-behavior: smooth;
+    direction: rtl; 
         }
         .entreeMsg {
             height: 15%;
@@ -73,10 +75,10 @@
             display: none;
         }
         .me{
-            text-align: left;
+            text-align: right;
         }
         .you{
-            text-align: right;
+            text-align: left;
         }
     </style>
 
@@ -125,20 +127,24 @@
 
         if (resp.status === 200) {
             let template = ``;
-
+            data.reverse(); 
             data.forEach(msg => {
-                const msgAuthorId = msg.author;
-                const msgClass = userId == msgAuthorId ? 'me' : 'you';
+    const msgAuthorId = msg.author;
+    const msgClass = userId == msgAuthorId ? 'me' : 'you';
 
-                console.log('ID utilisateur:', userId);
-                console.log('ID de l\'auteur du message:', msgAuthorId);
+    console.log('ID utilisateur:', userId);
+    console.log('ID de l\'auteur du message:', msgAuthorId);
 
-                template += `
-                    <div class="unMsg ${msgClass}">
-                        <h3>${msg.title.rendered}</h3><br>${msg.content.rendered}
-                    </div>
-                `;
-            });
+    // Formatage de la date
+    const messageDate = new Date(msg.date);
+    const formattedDate = `${messageDate.getHours()}:${String(messageDate.getMinutes()).padStart(2, '0')}`;
+
+    template += `
+        <div class="unMsg ${msgClass}">
+            <h3>${msg.title.rendered}</h3><br>${msg.content.rendered}<p class="heure">${formattedDate}</p>
+        </div>
+    `;
+});
 
             defilMsg.innerHTML = "";
             defilMsg.innerHTML += template;
@@ -151,8 +157,6 @@
 }
 
 
-    
-// ...
 
 sendMsg.addEventListener('click', e => {
     e.preventDefault();
