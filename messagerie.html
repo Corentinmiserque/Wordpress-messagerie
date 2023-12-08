@@ -24,6 +24,7 @@
         }
         .listeMsg {
             height: 85%;
+            overflow-y: auto;
             background-color: grey;
         }
         .entreeMsg {
@@ -65,6 +66,12 @@
         .hidden {
             display: none;
         }
+        .me{
+            text-align: left;
+        }
+        .you{
+            text-align: right;
+        }
     </style>
 
 </head>
@@ -82,7 +89,7 @@
         <form action="" class="entreeMsg">
             <input class="titreMsg" type="text" name="title" id="titre" placeholder="Votre Titre..">
             <label for="titre"></label>
-            <input class="contenuMsg" type="text" name="content" id="contenu" placeholder="Votre Message..">
+            <input class="contenuMsg" type="text" name="content" id="contenu" placeholder="Votre Message.." required>
             <label for="contenu"></label>
             <input class="hidden" type="text" name="status" value="published">
             <button class="envoyerMsg" type="submit">></button>
@@ -97,52 +104,81 @@
         const formSendMsg = document.querySelector('.entreeMsg')
 
         async function getMsgs() {
-            try {
-            const resp = await fetch(`https://cepegra-frontend.xyz/wp-json/wp/v2/message`)
-            const data = await resp.json()
-            let status = resp.status
-            console.log(data)
-            if(resp.status = 200) {
-                let template = ``
-                data.forEach(msg => {
-                    template += `
-                        <div class="unMsg">
+    try {
+        const userId = sessionStorage.getItem('id');
+        if (!userId) {
+            console.error('ID utilisateur non trouvé dans le stockage local');
+            return;
+        }
+
+        const resp = await fetch(`https://cepegra-frontend.xyz/wp-json/wp/v2/message`);
+        const data = await resp.json();
+        let status = resp.status;
+        console.log(data);
+
+        if (resp.status === 200) {
+            let template = ``;
+
+            data.forEach(msg => {
+                const msgAuthorId = msg.author;
+                const msgClass = userId == msgAuthorId ? 'me' : 'you';
+
+                console.log('ID utilisateur:', userId);
+                console.log('ID de l\'auteur du message:', msgAuthorId);
+
+                template += `
+                    <div class="unMsg ${msgClass}">
                         <h3>${msg.title.rendered}</h3><br>${msg.content.rendered}
+                    </div>
+                `;
+            });
 
-                        </div>
-                    `
-                });
-                defilMsg.innerHTML = ""
-                defilMsg.innerHTML += template
-            }
-            else {alert('coucou')}
-            }
-            catch(error) {console.log('erreur', error.message)}
+            defilMsg.innerHTML = "";
+            defilMsg.innerHTML += template;
+        } else {
+            alert('coucou');
         }
+    } catch (error) {
+        console.log('erreur', error.message);
+    }
+}
+
+
     
-    sendMsg.addEventListener('click', e => {
-        e.preventDefault()
-        let data = new FormData(formSendMsg)
-        let dataJson = {
-            "title": data.get('title'),
-            "content": data.get('content'),
-            "status": "publish"
-        }
-        console.log(dataJson)
+// ...
 
-        fetch('https://cepegra-frontend.xyz/wp-json/wp/v2/message', {
-            method : 'POST',
-            headers : {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2NlcGVncmEtZnJvbnRlbmQueHl6IiwiaWF0IjoxNzAyMDQxMTM2LCJuYmYiOjE3MDIwNDExMzYsImV4cCI6MTcwMjY0NTkzNiwiZGF0YSI6eyJ1c2VyIjp7ImlkIjoiMyJ9fX0.pnzCMln2IBnv-_9GIjsBvTupc98CKYXO6YNXgO5k81M'
-                },
-            body : JSON.stringify(dataJson)
-            // "title":"test 4","content":"<p>test contenu 4</p>","status":"publish"
-            })
+sendMsg.addEventListener('click', e => {
+    e.preventDefault();
+
+    const userToken = sessionStorage.getItem('token');
+    if (!userToken) {
+        console.error('Token utilisateur non trouvé dans le stockage local');
+        return;
+    }
+
+    let data = new FormData(formSendMsg);
+    let dataJson = {
+        "title": data.get('title'),
+        "content": data.get('content'),
+        "status": "publish"
+    };
+    console.log(dataJson);
+
+    fetch('https://cepegra-frontend.xyz/wp-json/wp/v2/message', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userToken}`
+        },
+        body: JSON.stringify(dataJson)
+    })
         .then(resp => resp.json())
         .then(resp => console.log(resp))
         .catch(err => console.error(err));
-    })
+});
+
+
+
 
 setInterval(getMsgs, 2000)
         
